@@ -1,0 +1,112 @@
+# Settings for NIFTY 50 Market Regime Platform
+
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  sample_dir: "data/sample"
+  nifty_ticker: "^NSEI"
+  vix_ticker: "^INDIAVIX"
+  default_start_date: "2010-01-01"
+  # Set to null or a valid date string
+  default_end_date: null
+
+# Validation settings
+validation:
+  required_columns:
+    - date
+    - open
+    - high
+    - low
+    - close
+    - volume
+  numeric_columns:
+    - open
+    - high
+    - low
+    - close
+    - volume
+  vix_required_columns:
+    - date
+    - close
+
+# CSV Column mappings for manual imports from various NSE formats
+csv_mappings:
+  date_columns:
+    - "Date"
+    - "date"
+    - "DATE"
+    - "Date "
+    - "Record Date"
+  open_columns:
+    - "Open"
+    - "open"
+    - "OPEN"
+    - "Open Price"
+  high_columns:
+    - "High"
+    - "high"
+    - "HIGH"
+    - "High Price"
+  low_columns:
+    - "Low"
+    - "low"
+    - "LOW"
+    - "Low Price"
+  close_columns:
+    - "Close"
+    - "close"
+    - "CLOSE"
+    - "Close Price"
+    - "Index Value"
+  volume_columns:
+    - "Volume"
+    - "volume"
+    - "VOLUME"
+    - "Shares Traded"
+    - "No. of Shares"
+  turnover_columns:
+    - "Turnover"
+    - "turnover"
+    - "TURNOVER"
+    - "Turnover (Rs. Cr)"
+    - "Turnover (₹ Cr)"
+
+# Feature engineering configuration
+features:
+  feature_parquet_path: "data/processed/features.parquet"
+  scaler_joblib_path: "models/saved/scaler.joblib"
+  metadata_yaml_path: "data/processed/feature_metadata.yaml"
+  
+  # Volatility lookbacks
+  volatility_windows: [5, 10, 21, 63]
+  
+  # Trend moving averages
+  sma_windows: [20, 50, 100, 200]
+  ema_windows: [9, 21, 50, 200]
+  
+  # Momentum periods
+  rsi_period: 14
+  macd_fast: 12
+  macd_slow: 26
+  macd_signal: 9
+  stochastic_k: 14
+  stochastic_d: 3
+  williams_r_period: 14
+  roc_period: 10
+  
+  # Statistical/Complexity windows
+  stats_window: 21
+  hurst_window: 126
+  entropy_window: 63
+  entropy_bins: 10
+  
+  # Feature selection thresholds
+  variance_threshold: 1e-4
+  correlation_threshold: 0.90
+  
+  # External tickers (best-effort optional fetch)
+  external_tickers:
+    sp500: "^GSPC"
+    usd_inr: "USDINR=X"
+    crude_oil: "CL=F"
+

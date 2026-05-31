@@ -1,0 +1,21 @@
+[tool.black]
+line-length = 88
+target-version = ['py311']
+include = '\.pyi?$'
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+select = ["E", "F", "W", "I", "N", "B", "A", "C4", "SIM", "ARG", "PTH"]
+ignore = []
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
+pythonpath = ["."]
