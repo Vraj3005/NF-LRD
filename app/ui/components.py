@@ -155,14 +155,12 @@ def render_chart_card(title: str, fig, subtitle: str = None):
                 if subtitle
                 else ""
             )
-            render_html(
-                f"""
+            render_html(f"""
                 <div style="border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-sm); margin-bottom: var(--space-md);">
                     <h4 style="margin: 0; font-size: 1.0rem; color: var(--text-primary);">{title}</h4>
                     {subtitle_html}
                 </div>
-                """
-            )
+                """)
         st.plotly_chart(fig, width="stretch")
 
 
@@ -179,19 +177,16 @@ def render_table_card(
                 if subtitle
                 else ""
             )
-            render_html(
-                f"""
+            render_html(f"""
                 <div style="border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-sm); margin-bottom: var(--space-md);">
                     <h4 style="margin: 0; font-size: 1.0rem; color: var(--text-primary);">{title}</h4>
                     {subtitle_html}
                 </div>
-                """
-            )
+                """)
         if formatter:
             st.dataframe(df.style.format(formatter), width="stretch")
         else:
             st.dataframe(df, width="stretch")
-
 
 
 def render_page_header(title: str, subtitle: str):

@@ -253,7 +253,6 @@ def render_educational_disclaimer():
     pass
 
 
-
 def render_status_pill(label: str, status_type: str = "success"):
     """
     Renders a premium diagnostics status pill.

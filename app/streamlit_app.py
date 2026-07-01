@@ -4,16 +4,18 @@ Streamlit Dashboard for NIFTY 50 Market Regime Intelligence Platform.
 
 import os
 import sys
-import warnings
 import threading
+import warnings
 from datetime import datetime
 from typing import Any, Dict, Optional, Tuple
+
 
 # Suppress RuntimeError: Event loop is closed during asyncio shutdown in background threads
 def _suppress_shutdown_errors(args):
     if args.exc_type is RuntimeError and "Event loop is closed" in str(args.exc_value):
         return
     threading.__excepthook__(args)
+
 
 threading.excepthook = _suppress_shutdown_errors
 
@@ -365,7 +367,6 @@ def main():
     # ----------------------------------------------------
     tc_input = 10.0
     slip_input = 5.0
-
 
     mc_sims = st.sidebar.number_input(
         "Monte Carlo Paths",
@@ -2135,7 +2136,6 @@ def main():
             $$\text{Cost}_t = (\\text{Fee} + \\text{Slippage}) \\times |w_t - w_{t-1}|$$
             where Fee = 10 bps and Slippage = 5 bps. This models the physical execution drag in volatile markets.
             """)
-
 
     # Render global educational disclaimer
     render_educational_disclaimer()

@@ -178,10 +178,13 @@ def plot_monte_carlo_paths(
 
     try:
         import streamlit as st
+
         theme = st.session_state.get("theme", "light")
     except Exception:
         theme = "light"
-    path_color = "rgba(15, 23, 42, 0.12)" if theme == "light" else "rgba(255, 255, 255, 0.25)"
+    path_color = (
+        "rgba(15, 23, 42, 0.12)" if theme == "light" else "rgba(255, 255, 255, 0.25)"
+    )
 
     # Plot first 10 paths as visual reference
     for i in range(min(10, n_sims)):
@@ -315,10 +318,13 @@ def plot_regime_overlaid_price(labeled_df: pd.DataFrame) -> go.Figure:
 
     try:
         import streamlit as st
+
         theme = st.session_state.get("theme", "light")
     except Exception:
         theme = "light"
-    line_color = "rgba(15, 23, 42, 0.85)" if theme == "light" else "rgba(255, 255, 255, 0.85)"
+    line_color = (
+        "rgba(15, 23, 42, 0.85)" if theme == "light" else "rgba(255, 255, 255, 0.85)"
+    )
 
     fig.add_trace(
         go.Scatter(

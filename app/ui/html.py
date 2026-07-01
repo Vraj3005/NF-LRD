@@ -17,7 +17,6 @@ def render_html(html: str, sidebar: bool = False) -> None:
         st.markdown(cleaned_html, unsafe_allow_html=True)
 
 
-
 def render_spacing(height_px: int) -> None:
     """
     Renders standardized vertical spacing.

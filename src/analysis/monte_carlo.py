@@ -34,9 +34,7 @@ class MonteCarloSimulator:
 
         # Calculate daily returns from raw closing prices to ensure they are unscaled
         if "raw_close" in self.df.columns:
-            self.df["ret_simple"] = self.df["raw_close"].pct_change(
-                fill_method=None
-            )
+            self.df["ret_simple"] = self.df["raw_close"].pct_change(fill_method=None)
         elif "close" in self.df.columns:
             self.df["ret_simple"] = self.df["close"].pct_change(fill_method=None)
         elif "ret_simple" not in self.df.columns:
@@ -256,7 +254,9 @@ class MonteCarloSimulator:
 
         # Pre-compute cumulative probabilities for fast transition simulation
         # Normalize transition matrix rows to guarantee sum to 1.0
-        matrix_stressed_norm = matrix_stressed / np.sum(matrix_stressed, axis=1, keepdims=True)
+        matrix_stressed_norm = matrix_stressed / np.sum(
+            matrix_stressed, axis=1, keepdims=True
+        )
         cum_transitions = np.cumsum(matrix_stressed_norm, axis=1)
 
         # Simulate state pathways for all simulations
@@ -275,7 +275,7 @@ class MonteCarloSimulator:
         # Vectorized returns assignment based on simulated state occupancy masks
         sim_rets = np.zeros((horizon, n_sims))
         for state in range(n_states):
-            mask = (state_paths == state)
+            mask = state_paths == state
             n_samples = int(np.sum(mask))
             if n_samples > 0:
                 sampled_rets = self._sample_returns(
