@@ -1,0 +1,10 @@
+{
+    "ticker": "^NSEI",
+    "start_date": "2010-01-04",
+    "end_date": "2026-06-30",
+    "downloaded_at": "2026-07-01T18:11:31Z",
+    "source": "yfinance",
+    "row_count": 4048,
+    "missing_value_count": 0,
+    "dataset_hash": "7ab177bc828a39847186577e43de6ebf6d5ab035c0ca87ac94bc51838443e7a1"
+}
