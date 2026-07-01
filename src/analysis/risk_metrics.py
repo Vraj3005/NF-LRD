@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Any, Optional
 
 def calculate_cagr(returns: pd.Series) -> float:
     """Calculates the Compound Annual Growth Rate (CAGR)."""

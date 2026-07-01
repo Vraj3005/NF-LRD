@@ -3,7 +3,7 @@ import numpy as np
 import scipy.stats
 from scipy.special import logsumexp
 import joblib
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Tuple
 
 logger = logging.getLogger(__name__)
 
