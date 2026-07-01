@@ -1,6 +1,8 @@
+from typing import Dict, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from typing import Tuple, Dict, Any, Optional
+
 
 def calculate_cagr(returns: pd.Series) -> float:
     """Calculates the Compound Annual Growth Rate (CAGR)."""
@@ -12,11 +14,13 @@ def calculate_cagr(returns: pd.Series) -> float:
         return float((cum_ret) ** (1.0 / n_years) - 1.0)
     return 0.0
 
+
 def calculate_annualized_volatility(returns: pd.Series) -> float:
     """Calculates annualized standard deviation of returns."""
     if len(returns) == 0:
         return 0.0
     return float(returns.std() * np.sqrt(252.0))
+
 
 def calculate_sharpe_ratio(returns: pd.Series, risk_free_rate: float = 0.0) -> float:
     """Calculates the annualized Sharpe Ratio."""
@@ -28,14 +32,18 @@ def calculate_sharpe_ratio(returns: pd.Series, risk_free_rate: float = 0.0) -> f
         return float(ann_excess_ret / vol)
     return 0.0
 
-def calculate_downside_deviation(returns: pd.Series, target_return: float = 0.0) -> float:
+
+def calculate_downside_deviation(
+    returns: pd.Series, target_return: float = 0.0
+) -> float:
     """Calculates the downside deviation below a target return (annualized)."""
     if len(returns) == 0:
         return 0.0
     downside_diff = returns - (target_return / 252.0)
     downside_diff = downside_diff.clip(upper=0.0)
-    variance = (downside_diff ** 2).mean()
+    variance = (downside_diff**2).mean()
     return float(np.sqrt(variance) * np.sqrt(252.0))
+
 
 def calculate_sortino_ratio(returns: pd.Series, risk_free_rate: float = 0.0) -> float:
     """Calculates the Sortino Ratio."""
@@ -46,7 +54,10 @@ def calculate_sortino_ratio(returns: pd.Series, risk_free_rate: float = 0.0) -> 
         return float(ann_excess_ret / downside_dev)
     return 0.0
 
-def calculate_drawdown_series(returns: pd.Series) -> Tuple[pd.Series, pd.Series, pd.Series]:
+
+def calculate_drawdown_series(
+    returns: pd.Series,
+) -> Tuple[pd.Series, pd.Series, pd.Series]:
     """
     Computes cumulative returns, peak returns, and drawdown series.
     Returns: (cum_returns, peak_returns, drawdown_series)
@@ -56,6 +67,7 @@ def calculate_drawdown_series(returns: pd.Series) -> Tuple[pd.Series, pd.Series,
     drawdowns = (cum_returns - peak_returns) / (peak_returns + 1e-15)
     return cum_returns, peak_returns, drawdowns
 
+
 def calculate_max_drawdown(returns: pd.Series) -> float:
     """Calculates maximum peak-to-trough drawdown."""
     if len(returns) == 0:
@@ -63,6 +75,7 @@ def calculate_max_drawdown(returns: pd.Series) -> float:
     _, _, drawdowns = calculate_drawdown_series(returns)
     max_dd = drawdowns.min()
     return float(max_dd) if not np.isnan(max_dd) else 0.0
+
 
 def calculate_average_drawdown(returns: pd.Series) -> float:
     """Calculates the average drawdown when the asset is below peak levels."""
@@ -74,20 +87,22 @@ def calculate_average_drawdown(returns: pd.Series) -> float:
         return float(negative_drawdowns.mean())
     return 0.0
 
+
 def calculate_drawdown_duration(returns: pd.Series) -> int:
     """Calculates the maximum drawdown duration in trading days."""
     if len(returns) == 0:
         return 0
     _, _, drawdowns = calculate_drawdown_series(returns)
-    
+
     # Identify duration of consecutive days spent in drawdown (drawdown < 0)
     is_in_dd = (drawdowns < 0.0).astype(int)
     # Group consecutive drawdown days using cumulative sum of flips
     flips = (is_in_dd == 0).cumsum()
     durations = is_in_dd.groupby(flips).sum()
-    
+
     max_dur = durations.max()
     return int(max_dur) if not np.isnan(max_dur) else 0
+
 
 def calculate_calmar_ratio(returns: pd.Series) -> float:
     """Calculates the Calmar Ratio (CAGR / Max Drawdown absolute value)."""
@@ -97,11 +112,13 @@ def calculate_calmar_ratio(returns: pd.Series) -> float:
         return float(cagr / abs(max_dd))
     return 0.0
 
+
 def calculate_win_rate(returns: pd.Series) -> float:
     """Calculates percentage of trading days with positive returns."""
     if len(returns) == 0:
         return 0.0
     return float((returns > 0.0).sum() / len(returns))
+
 
 def calculate_profit_factor(returns: pd.Series) -> float:
     """Calculates the profit factor (gross gains / gross losses)."""
@@ -111,14 +128,15 @@ def calculate_profit_factor(returns: pd.Series) -> float:
         return float(gains / losses)
     return 999.0 if gains > 0.0 else 0.0
 
+
 def calculate_var_cvar(returns: pd.Series, alpha: float = 0.95) -> Tuple[float, float]:
     """
     Computes historical Value at Risk (VaR) and Conditional Value at Risk (CVaR).
-    
+
     Args:
         returns: pd.Series of daily returns.
         alpha: Confidence level (e.g. 0.95 or 0.99).
-        
+
     Returns:
         Tuple[float, float]: (VaR, CVaR) as daily fraction values.
     """
@@ -126,17 +144,18 @@ def calculate_var_cvar(returns: pd.Series, alpha: float = 0.95) -> Tuple[float, 
         return 0.0, 0.0
     sorted_returns = returns.sort_values()
     percentile_idx = int((1.0 - alpha) * len(sorted_returns))
-    
+
     # Daily VaR: maximum expected loss at (1-alpha) confidence
     # We take the negative value to represent loss as positive, or keep sign.
     # Standard practice: VaR is represented as positive loss, but let's keep daily return sign
     # (negative) to avoid sign confusion, or return absolute loss. Let's return absolute loss.
     var_val = abs(sorted_returns.iloc[percentile_idx])
-    
+
     # CVaR is the average return of the worst (1-alpha) percentile outcomes
-    cvar_val = abs(sorted_returns.iloc[:percentile_idx + 1].mean())
-    
+    cvar_val = abs(sorted_returns.iloc[: percentile_idx + 1].mean())
+
     return float(var_val), float(cvar_val)
+
 
 def compute_rolling_sharpe(returns: pd.Series, window: int = 63) -> pd.Series:
     """Computes rolling Sharpe ratio over a moving window."""
@@ -144,14 +163,14 @@ def compute_rolling_sharpe(returns: pd.Series, window: int = 63) -> pd.Series:
     rolling_std = returns.rolling(window=window).std()
     return (rolling_mean / (rolling_std + 1e-15)) * np.sqrt(252.0)
 
+
 def compute_rolling_volatility(returns: pd.Series, window: int = 63) -> pd.Series:
     """Computes rolling annualized volatility."""
     return returns.rolling(window=window).std() * np.sqrt(252.0)
 
+
 def compute_rolling_beta(
-    returns: pd.Series, 
-    benchmark_returns: pd.Series, 
-    window: int = 63
+    returns: pd.Series, benchmark_returns: pd.Series, window: int = 63
 ) -> pd.Series:
     """
     Computes the rolling beta of returns relative to benchmark returns.
@@ -161,16 +180,33 @@ def compute_rolling_beta(
     df = pd.concat([returns, benchmark_returns], axis=1).dropna()
     if df.empty:
         return pd.Series(0.0, index=returns.index)
-        
+
     asset_col = df.columns[0]
     bench_col = df.columns[1]
-    
+
     covariance = df[asset_col].rolling(window=window).cov(df[bench_col])
     benchmark_variance = df[bench_col].rolling(window=window).var()
-    
+
     return covariance / (benchmark_variance + 1e-15)
 
-def calculate_portfolio_risk_report(returns: pd.Series, benchmark_returns: Optional[pd.Series] = None) -> Dict[str, float]:
+
+def calculate_worst_month(returns: pd.Series) -> float:
+    """Calculates the return of the worst-performing month in the series."""
+    if len(returns) == 0:
+        return 0.0
+    series = returns.copy()
+    if not isinstance(series.index, pd.DatetimeIndex):
+        series.index = pd.to_datetime(series.index)
+    try:
+        monthly_ret = series.resample("ME").apply(lambda r: (1.0 + r).prod() - 1.0)
+    except ValueError:
+        monthly_ret = series.resample("M").apply(lambda r: (1.0 + r).prod() - 1.0)
+    return float(monthly_ret.min()) if len(monthly_ret) > 0 else 0.0
+
+
+def calculate_portfolio_risk_report(
+    returns: pd.Series, benchmark_returns: Optional[pd.Series] = None
+) -> Dict[str, float]:
     """Generates a complete dictionary of risk performance metrics for a return series."""
     cagr = calculate_cagr(returns)
     vol = calculate_annualized_volatility(returns)
@@ -182,10 +218,12 @@ def calculate_portfolio_risk_report(returns: pd.Series, benchmark_returns: Optio
     profit_factor = calculate_profit_factor(returns)
     avg_dd = calculate_average_drawdown(returns)
     dd_dur = calculate_drawdown_duration(returns)
-    
+    downside_dev = calculate_downside_deviation(returns, 0.0)
+    worst_m = calculate_worst_month(returns)
+
     var_95, cvar_95 = calculate_var_cvar(returns, 0.95)
     var_99, cvar_99 = calculate_var_cvar(returns, 0.99)
-    
+
     report = {
         "CAGR": cagr,
         "Annualized_Volatility": vol,
@@ -200,9 +238,11 @@ def calculate_portfolio_risk_report(returns: pd.Series, benchmark_returns: Optio
         "Daily_VaR_95": var_95,
         "Daily_CVaR_95": cvar_95,
         "Daily_VaR_99": var_99,
-        "Daily_CVaR_99": cvar_99
+        "Daily_CVaR_99": cvar_99,
+        "Downside_Deviation": downside_dev,
+        "Worst_Month": worst_m,
     }
-    
+
     if benchmark_returns is not None:
         # Calculate full beta
         df = pd.concat([returns, benchmark_returns], axis=1).dropna()
@@ -212,5 +252,5 @@ def calculate_portfolio_risk_report(returns: pd.Series, benchmark_returns: Optio
             report["Beta"] = float(cov / (var + 1e-15))
         else:
             report["Beta"] = 1.0
-            
+
     return report

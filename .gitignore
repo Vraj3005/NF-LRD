@@ -54,8 +54,11 @@ data/sample/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !data/sample/.gitkeep
+!data/sample/*.csv
 models/saved/*
 !models/saved/.gitkeep
+models/reports/*
+!models/reports/.gitkeep
 
 # IDEs and OS files
 .vscode/

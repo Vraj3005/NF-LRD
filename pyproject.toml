@@ -6,16 +6,38 @@ include = '\.pyi?$'
 [tool.ruff]
 line-length = 88
 target-version = "py311"
-select = ["E", "F", "W", "I", "N", "B", "A", "C4", "SIM", "ARG", "PTH"]
-ignore = []
 
-[tool.ruff.mccabe]
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501", "E402"]
+
+[tool.ruff.lint.mccabe]
 max-complexity = 10
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -q"
+addopts = "-ra -q --cov=src --cov-report=term-missing --cov-report=xml"
 testpaths = [
     "tests",
 ]
 pythonpath = ["."]
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise ImportError"
+]
+
+[tool.pyrefly]
+search-path = ["."]
+
