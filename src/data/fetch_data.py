@@ -1,18 +1,29 @@
-import os
-import yaml
 import logging
+import os
+from datetime import datetime
+from typing import Any, Dict, Optional
+
 import pandas as pd
 import yfinance as yf
-from typing import Optional, Dict, Any
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+try:
+    import yaml
+
+    YAML_AVAILABLE = True
+except ImportError:
+    YAML_AVAILABLE = False
+    logger.warning("PyYAML is not installed. Using default configuration settings.")
+
+
 def load_settings(config_path: str = "config/settings.yaml") -> Dict[str, Any]:
     """Loads configuration settings from a YAML file."""
-    if not os.path.exists(config_path):
-        # Fallback to defaults if settings file is not found
-        logger.warning(f"Configuration file {config_path} not found. Using default dictionary configuration.")
+    if not YAML_AVAILABLE or not os.path.exists(config_path):
+        # Fallback to defaults if settings file is not found or YAML is missing
+        logger.warning(
+            f"Configuration file {config_path} not found or YAML parser unavailable. Using default dictionary configuration."
+        )
         return {
             "data": {
                 "raw_dir": "data/raw",
@@ -21,17 +32,16 @@ def load_settings(config_path: str = "config/settings.yaml") -> Dict[str, Any]:
                 "nifty_ticker": "^NSEI",
                 "vix_ticker": "^INDIAVIX",
                 "default_start_date": "2010-01-01",
-                "default_end_date": None
+                "default_end_date": None,
             }
         }
-    
-    with open(config_path, 'r', encoding='utf-8') as file:
+
+    with open(config_path, "r", encoding="utf-8") as file:
         return yaml.safe_load(file)
 
+
 def fetch_ticker_data(
-    ticker: str, 
-    start_date: str, 
-    end_date: Optional[str] = None
+    ticker: str, start_date: str, end_date: Optional[str] = None
 ) -> Optional[pd.DataFrame]:
     """
     Downloads historical daily data for a given ticker from yfinance.
@@ -44,34 +54,37 @@ def fetch_ticker_data(
     Returns:
         Optional[pd.DataFrame]: DataFrame of historical data or None if download fails.
     """
-    logger.info(f"Downloading data for ticker {ticker} from {start_date} to {end_date or 'today'}...")
+    logger.info(
+        f"Downloading data for ticker {ticker} from {start_date} to {end_date or 'today'}..."
+    )
     try:
         # Fetching data using yfinance
         df = yf.download(
-            tickers=ticker, 
-            start=start_date, 
-            end=end_date, 
-            progress=False, 
-            auto_adjust=False  # We want both Close and Adj Close
+            tickers=ticker,
+            start=start_date,
+            end=end_date,
+            progress=False,
+            auto_adjust=False,  # We want both Close and Adj Close
         )
-        
+
         if df.empty:
             logger.warning(f"No data returned for ticker {ticker}.")
             return None
-        
+
         # Reset index to make Date a column
         df = df.reset_index()
-        
+
         # yfinance columns might be MultiIndex if downloaded with multiple tickers,
         # but here we download singly. Let's flatten columns if needed
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = [col[0] for col in df.columns]
-            
+
         logger.info(f"Successfully downloaded {len(df)} rows for {ticker}.")
         return df
     except Exception as e:
         logger.error(f"Error downloading data for ticker {ticker}: {e}")
         return None
+
 
 def save_raw_data(df: pd.DataFrame, filename: str, raw_dir: str) -> str:
     """
@@ -91,10 +104,11 @@ def save_raw_data(df: pd.DataFrame, filename: str, raw_dir: str) -> str:
     logger.info(f"Saved raw data to {file_path}")
     return os.path.abspath(file_path)
 
+
 def execute_fetch_pipeline(
-    start_date: Optional[str] = None, 
+    start_date: Optional[str] = None,
     end_date: Optional[str] = None,
-    config_path: str = "config/settings.yaml"
+    config_path: str = "config/settings.yaml",
 ) -> Dict[str, str]:
     """
     Orchestrates the fetching process for both Nifty 50 and India VIX.
@@ -108,34 +122,72 @@ def execute_fetch_pipeline(
         Dict[str, str]: Map of ticker names to absolute saved file paths.
     """
     settings = load_settings(config_path)
-    
+
     # Resolve dates
     start = start_date or settings["data"].get("default_start_date", "2010-01-01")
     end = end_date or settings["data"].get("default_end_date")
-    
+
     if not end:
-        end = datetime.today().strftime('%Y-%m-%d')
-        
+        end = datetime.today().strftime("%Y-%m-%d")
+
     raw_dir = settings["data"].get("raw_dir", "data/raw")
     nifty_ticker = settings["data"].get("nifty_ticker", "^NSEI")
     vix_ticker = settings["data"].get("vix_ticker", "^INDIAVIX")
-    
+
     saved_files = {}
-    
+
     # Fetch NIFTY 50
     nifty_df = fetch_ticker_data(nifty_ticker, start, end)
     if nifty_df is not None:
         saved_path = save_raw_data(nifty_df, "nifty_raw.csv", raw_dir)
         saved_files["nifty"] = saved_path
+        saved_files["nifty_source"] = "yfinance"
     else:
-        logger.error("Failed to download NIFTY 50 data.")
-        
+        logger.warning(
+            "Failed to download NIFTY 50 from Yahoo Finance. Falling back to cached local sample data..."
+        )
+        sample_nifty_path = os.path.join(
+            settings["data"].get("sample_dir", "data/sample"), "nifty_raw.csv"
+        )
+        if os.path.exists(sample_nifty_path):
+            os.makedirs(raw_dir, exist_ok=True)
+            saved_path = os.path.join(raw_dir, "nifty_raw.csv")
+            import shutil
+
+            shutil.copy(sample_nifty_path, saved_path)
+            logger.info(
+                f"Successfully copied cached sample data from {sample_nifty_path} to {saved_path}"
+            )
+            saved_files["nifty"] = os.path.abspath(saved_path)
+            saved_files["nifty_source"] = "local_cache"
+        else:
+            logger.error("No local cached sample data found for NIFTY 50.")
+
     # Fetch India VIX (optional/best-effort)
     vix_df = fetch_ticker_data(vix_ticker, start, end)
     if vix_df is not None:
         saved_path = save_raw_data(vix_df, "vix_raw.csv", raw_dir)
         saved_files["vix"] = saved_path
+        saved_files["vix_source"] = "yfinance"
     else:
-        logger.warning("Failed or skipped downloading India VIX.")
-        
+        logger.warning(
+            "Failed or skipped downloading India VIX from Yahoo Finance. Falling back to cached local sample data..."
+        )
+        sample_vix_path = os.path.join(
+            settings["data"].get("sample_dir", "data/sample"), "vix_raw.csv"
+        )
+        if os.path.exists(sample_vix_path):
+            os.makedirs(raw_dir, exist_ok=True)
+            saved_path = os.path.join(raw_dir, "vix_raw.csv")
+            import shutil
+
+            shutil.copy(sample_vix_path, saved_path)
+            logger.info(
+                f"Successfully copied cached sample data from {sample_vix_path} to {saved_path}"
+            )
+            saved_files["vix"] = os.path.abspath(saved_path)
+            saved_files["vix_source"] = "local_cache"
+        else:
+            logger.warning("No local cached sample data found for India VIX.")
+
     return saved_files

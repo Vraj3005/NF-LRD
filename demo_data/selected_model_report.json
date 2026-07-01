@@ -1,0 +1,88 @@
+{
+    "selected_model_type": "HMM",
+    "n_components": 6,
+    "selection_rationale": "Minimized BIC parameter penalty (HMM baseline sweep)",
+    "evaluation_metrics": {
+        "model_type": "HMM",
+        "n_components": 6,
+        "log_likelihood": -145891.33347191964,
+        "aic": 292812.6669438393,
+        "bic": 296024.2871096061,
+        "silhouette_score": 0.06588521422613478,
+        "avg_duration": 14.46360153256705
+    },
+    "seed_sensitivity_ari": 0.44081408796073196,
+    "walk_forward_validation": {
+        "regime_stability": [
+            {
+                "regime_state": 0,
+                "train_days": 898,
+                "test_days": 371,
+                "train_annualized_return": 0.5023154475565969,
+                "test_annualized_return": 0.4291072214398151,
+                "train_annualized_vol": 0.10857881027356187,
+                "test_annualized_vol": 0.09836154559906268,
+                "return_stability_delta": 0.07320822611678174,
+                "vol_stability_delta": 0.010217264674499182
+            },
+            {
+                "regime_state": 1,
+                "train_days": 73,
+                "test_days": 97,
+                "train_annualized_return": -0.057180490362389425,
+                "test_annualized_return": 0.39484841233233026,
+                "train_annualized_vol": 0.520720460507017,
+                "test_annualized_vol": 0.2082107635571019,
+                "return_stability_delta": 0.4520289026947197,
+                "vol_stability_delta": 0.31250969694991515
+            },
+            {
+                "regime_state": 2,
+                "train_days": 306,
+                "test_days": 155,
+                "train_annualized_return": -1.2574423673093418,
+                "test_annualized_return": -0.7733858081611714,
+                "train_annualized_vol": 0.20280235600640392,
+                "test_annualized_vol": 0.17295893622193978,
+                "return_stability_delta": 0.48405655914817036,
+                "vol_stability_delta": 0.029843419784464142
+            },
+            {
+                "regime_state": 3,
+                "train_days": 335,
+                "test_days": 54,
+                "train_annualized_return": 0.8169612729746049,
+                "test_annualized_return": 0.8209391399358956,
+                "train_annualized_vol": 0.17964201262078006,
+                "test_annualized_vol": 0.13713949465920622,
+                "return_stability_delta": 0.003977866961290766,
+                "vol_stability_delta": 0.04250251796157384
+            },
+            {
+                "regime_state": 4,
+                "train_days": 527,
+                "test_days": 152,
+                "train_annualized_return": 0.3009043351459461,
+                "test_annualized_return": 0.19018558476111164,
+                "train_annualized_vol": 0.14690208769127674,
+                "test_annualized_vol": 0.1138019336310619,
+                "return_stability_delta": 0.11071875038483447,
+                "vol_stability_delta": 0.03310015406021484
+            },
+            {
+                "regime_state": 5,
+                "train_days": 503,
+                "test_days": 304,
+                "train_annualized_return": -0.3272934750015864,
+                "test_annualized_return": -0.19549844568550542,
+                "train_annualized_vol": 0.15017832376859816,
+                "test_annualized_vol": 0.14028072555961546,
+                "return_stability_delta": 0.13179502931608097,
+                "vol_stability_delta": 0.0098975982089827
+            }
+        ],
+        "average_return_delta": 0.20929755577031303,
+        "average_volatility_delta": 0.07301177527327497,
+        "is_stable_oos": false
+    }
+}
