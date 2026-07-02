@@ -5,7 +5,22 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-from src.visualization.chart_theme import apply_chart_theme
+from src.visualization.chart_theme import apply_chart_theme, STRATEGY_COLORS
+
+
+def hex_to_rgba(hex_color: str, opacity: float) -> str:
+    """Converts a hex color string to rgba(r, g, b, opacity) format for Plotly compatibility."""
+    if not hex_color:
+        return f"rgba(16, 185, 129, {opacity})"
+    hex_color = hex_color.lstrip('#')
+    lv = len(hex_color)
+    if lv == 6:
+        r, g, b = int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
+    elif lv == 3:
+        r, g, b = int(hex_color[0]*2, 16), int(hex_color[1]*2, 16), int(hex_color[2]*2, 16)
+    else:
+        r, g, b = 16, 185, 129
+    return f"rgba({r}, {g}, {b}, {opacity})"
 
 
 def plot_equity_curves(equity_df: pd.DataFrame) -> go.Figure:
@@ -17,13 +32,14 @@ def plot_equity_curves(equity_df: pd.DataFrame) -> go.Figure:
 
     for col in equity_cols:
         label = col.replace("equity_", "").replace("_", " ").title()
+        color = STRATEGY_COLORS.get(label, None)
         fig.add_trace(
             go.Scatter(
                 x=equity_df["date"],
                 y=equity_df[col],
                 mode="lines",
                 name=label,
-                line=dict(width=2),
+                line=dict(width=2, color=color) if color else dict(width=2),
             )
         )
 
@@ -46,6 +62,7 @@ def plot_drawdowns(equity_df: pd.DataFrame) -> go.Figure:
 
     for col in equity_cols:
         label = col.replace("equity_", "").replace("_", " ").title()
+        color = STRATEGY_COLORS.get(label, None)
         # Compute drawdown series
         equity_series = equity_df[col]
         peak = equity_series.cummax()
@@ -60,7 +77,8 @@ def plot_drawdowns(equity_df: pd.DataFrame) -> go.Figure:
                 fill=(
                     "tozeroy" if col == "equity_hybrid" else None
                 ),  # Highlight hybrid drawdown
-                line=dict(width=1.5),
+                fillcolor=hex_to_rgba(color, 0.1) if color and col == "equity_hybrid" else None,
+                line=dict(width=1.5, color=color) if color else dict(width=1.5),
             )
         )
 
@@ -279,7 +297,7 @@ def plot_rolling_risk_metrics(
             y=rolling_sharpe,
             mode="lines",
             name="Rolling Sharpe Ratio (Left Axis)",
-            line=dict(color="orange", width=2),
+            line=dict(color="#3b82f6", width=2),
         )
     )
 
@@ -290,7 +308,7 @@ def plot_rolling_risk_metrics(
             y=rolling_vol,
             mode="lines",
             name="Rolling Volatility % (Right Axis)",
-            line=dict(color="cyan", width=1.5),
+            line=dict(color="#10b981", width=1.5),
             yaxis="y2",
         )
     )
@@ -336,23 +354,24 @@ def plot_regime_overlaid_price(labeled_df: pd.DataFrame) -> go.Figure:
         )
     )
 
-    # Define a modern color palette with low opacity for backgrounds
+    # Define a modern color palette with higher opacity for backgrounds
+    op_val = 0.40 if theme == "light" else 0.25
     color_map = {
-        "Bullish Low Volatility": "rgba(16, 185, 129, 0.08)",  # Emerald
-        "Bullish High Volatility": "rgba(5, 150, 105, 0.06)",  # Teal-Green
-        "Recovery Regime": "rgba(59, 130, 246, 0.06)",  # Blue
-        "Sideways Low Volatility": "rgba(245, 158, 11, 0.06)",  # Amber
-        "Distribution / Risk-Off Regime": "rgba(249, 115, 22, 0.08)",  # Orange
-        "Bearish High Volatility": "rgba(239, 68, 68, 0.1)",  # Rose
+        "Bullish Low Volatility": f"rgba(16, 185, 129, {op_val})",  # Emerald
+        "Bullish High Volatility": f"rgba(5, 150, 105, {op_val})",  # Teal-Green
+        "Recovery Regime": f"rgba(59, 130, 246, {op_val})",  # Blue
+        "Sideways Low Volatility": f"rgba(245, 158, 11, {op_val})",  # Amber
+        "Distribution / Risk-Off Regime": f"rgba(249, 115, 22, {op_val})",  # Orange
+        "Bearish High Volatility": f"rgba(239, 68, 68, {op_val})",  # Rose
     }
 
     default_colors = [
-        "rgba(245, 158, 11, 0.06)",  # State 0
-        "rgba(5, 150, 105, 0.06)",  # State 1
-        "rgba(249, 115, 22, 0.08)",  # State 2
-        "rgba(59, 130, 246, 0.06)",  # State 3
-        "rgba(16, 185, 129, 0.08)",  # State 4
-        "rgba(239, 68, 68, 0.1)",  # State 5
+        f"rgba(245, 158, 11, {op_val})",  # State 0
+        f"rgba(5, 150, 105, {op_val})",  # State 1
+        f"rgba(249, 115, 22, {op_val})",  # State 2
+        f"rgba(59, 130, 246, {op_val})",  # State 3
+        f"rgba(16, 185, 129, {op_val})",  # State 4
+        f"rgba(239, 68, 68, {op_val})",  # State 5
     ]
 
     # Find contiguous blocks of regimes
@@ -398,15 +417,13 @@ def plot_regime_overlaid_price(labeled_df: pd.DataFrame) -> go.Figure:
         state = row["regime_state"]
         label = row["regime_label"]
         # Use higher opacity for the legend markers
-        legend_color = (
-            color_map.get(label, default_colors[state % len(default_colors)])
-            .replace("0.12", "0.8")
-            .replace("0.08", "0.8")
-            .replace("0.15", "0.8")
-            .replace("0.06", "0.8")
-            .replace("0.1", "0.8")
-            .replace("0.07", "0.8")
-        )
+        rgba_val = color_map.get(label, default_colors[state % len(default_colors)])
+        if rgba_val.startswith("rgba"):
+            parts = rgba_val.split(",")
+            legend_color = f"{parts[0]},{parts[1]},{parts[2]}, 0.8)"
+        else:
+            legend_color = rgba_val
+
         fig.add_trace(
             go.Scatter(
                 x=[None],
@@ -803,13 +820,14 @@ def plot_rolling_sharpe(returns_dict: dict, window: int = 63) -> go.Figure:
         rolling_sharpe = (rolling_mean - 0.0) / rolling_std
 
         display_name = name.replace("_", " ").title()
+        color = STRATEGY_COLORS.get(display_name, None)
         fig.add_trace(
             go.Scatter(
                 x=series.index,
                 y=rolling_sharpe,
                 mode="lines",
                 name=display_name,
-                line=dict(width=1.5),
+                line=dict(width=1.5, color=color) if color else dict(width=1.5),
             )
         )
     fig.update_layout(
@@ -830,13 +848,14 @@ def plot_strategy_exposure(weights_dict: dict) -> go.Figure:
     fig = go.Figure()
     for name, series in weights_dict.items():
         display_name = name.replace("_", " ").title()
+        color = STRATEGY_COLORS.get(display_name, None)
         fig.add_trace(
             go.Scatter(
                 x=series.index,
                 y=series,
                 mode="lines",
                 name=display_name,
-                line=dict(width=1.5),
+                line=dict(width=1.5, color=color) if color else dict(width=1.5),
             )
         )
     fig.update_layout(

@@ -103,11 +103,60 @@ def inject_theme_css(theme: str = "light"):
         [data-testid="stSidebar"] {{
             background-color: var(--sidebar-bg) !important;
             border-right: 1px solid var(--sidebar-border) !important;
-            padding-top: 10px !important;
         }}
 
         [data-testid="stSidebar"] .main {{
             background-color: var(--sidebar-bg) !important;
+        }}
+
+        /* Compact and style the sidebar header containing the collapse button */
+        [data-testid="stSidebarHeader"] {{
+            padding: 8px 12px 0px 12px !important;
+            min-height: 36px !important;
+            height: 36px !important;
+            background-color: transparent !important;
+            display: flex !important;
+            justify-content: flex-end !important;
+            align-items: center !important;
+        }}
+
+        /* Style the collapse button to look like a premium SaaS widget */
+        [data-testid="stSidebarHeader"] button,
+        [data-testid="stSidebarCollapseButton"] button,
+        button[aria-label="Close sidebar"],
+        [data-testid="stSidebar"] button[data-testid="stBaseButton-header"] {{
+            background-color: var(--bg-card) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            width: 30px !important;
+            height: 30px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: var(--text-secondary) !important;
+            transition: all 0.2s ease-in-out !important;
+            padding: 0 !important;
+        }}
+
+        [data-testid="stSidebarHeader"] button:hover,
+        [data-testid="stSidebarCollapseButton"] button:hover,
+        button[aria-label="Close sidebar"]:hover,
+        [data-testid="stSidebar"] button[data-testid="stBaseButton-header"]:hover {{
+            background-color: var(--sidebar-active-bg) !important;
+            color: var(--sidebar-active-text) !important;
+            border-color: var(--sidebar-active-text) !important;
+            transform: scale(1.03);
+        }}
+
+        /* Remove default padding from user content area and set side margins */
+        [data-testid="stSidebarUserContent"] {{
+            padding-top: 0px !important;
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+        }}
+
+        section[data-testid="stSidebar"] > div:first-child {{
+            padding-top: 0rem !important;
         }}
 
         /* Navigation Nav items */
@@ -192,9 +241,17 @@ def inject_theme_css(theme: str = "light"):
             overflow: hidden !important;
         }}
 
-        /* Clean up standard Streamlit header clutter */
+        /* Clean up standard Streamlit header clutter and reduce top padding */
         [data-testid="stHeader"] {{
-            background-color: transparent !important;
+            display: none !important;
+            height: 0px !important;
+            min-height: 0px !important;
+        }}
+
+        .block-container {{
+            padding-top: 1.5rem !important;
+            padding-bottom: 1rem !important;
+            max-width: 95% !important;
         }}
 
         /* Override Streamlit native container border wrapper to look exactly like saas-card */
@@ -261,6 +318,39 @@ def inject_theme_css(theme: str = "light"):
         [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
         [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] span {{
             color: var(--sidebar-text) !important;
+        }}
+
+        /* Dropdown listbox and select item contrast overrides for theme switching */
+        ul[role="listbox"], [role="listbox"] {{
+            background-color: var(--bg-card) !important;
+            border: 1px solid var(--border-color) !important;
+        }}
+        
+        li[role="option"], [role="option"] {{
+            background-color: var(--bg-card) !important;
+            color: var(--text-primary) !important;
+        }}
+        
+        li[role="option"]:hover, [role="option"]:hover,
+        li[role="option"][aria-selected="true"], [role="option"][aria-selected="true"] {{
+            background-color: var(--sidebar-active-bg) !important;
+            color: var(--sidebar-active-text) !important;
+        }}
+
+        /* Input and form widgets background & text styling */
+        div[data-baseweb="select"] > div {{
+            background-color: var(--bg-card) !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }}
+        
+        div[data-baseweb="input"] input, 
+        .stNumberInput input, 
+        .stTextInput input, 
+        .stTextArea textarea {{
+            background-color: var(--bg-card) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
         }}
     </style>
     """

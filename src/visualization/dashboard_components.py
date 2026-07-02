@@ -332,8 +332,8 @@ def render_metric_card(
     st.markdown(
         f"""
         <div class="glass-card" style="padding: 20px; border-radius: 14px; margin-bottom: 15px;">
-            <div style="color: #94a3b8; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">{label}</div>
-            <div style="color: #ffffff; font-size: 1.85rem; font-weight: 700; font-family: 'Outfit', sans-serif; letter-spacing: -0.5px;">{value}</div>
+            <div style="color: var(--text-secondary); font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">{label}</div>
+            <div style="color: var(--text-primary); font-size: 1.85rem; font-weight: 700; font-family: 'Outfit', sans-serif; letter-spacing: -0.5px;">{value}</div>
             {change_html}
         </div>
         """,
@@ -360,14 +360,14 @@ def render_section_header(title: str, subtitle: str = None):
     Renders a stylized monospace section header.
     """
     subtitle_html = (
-        f'<div style="color: #94a3b8; font-size: 0.85rem; margin-top: 2px;">{subtitle}</div>'
+        f'<div style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 2px;">{subtitle}</div>'
         if subtitle
         else ""
     )
     st.markdown(
         f"""
-        <div style="margin-top: 25px; margin-bottom: 15px; border-left: 3px solid #3b82f6; padding-left: 12px;">
-            <div style="color: #f8fafc; font-size: 1.15rem; font-weight: 700; font-family: 'Outfit', sans-serif; letter-spacing: -0.2px;">{title}</div>
+        <div style="margin-top: 25px; margin-bottom: 15px; border-left: 3px solid var(--accent-color); padding-left: 12px;">
+            <div style="color: var(--text-primary); font-size: 1.15rem; font-weight: 700; font-family: 'Outfit', sans-serif; letter-spacing: -0.2px;">{title}</div>
             {subtitle_html}
         </div>
         """,
@@ -446,14 +446,14 @@ def render_risk_badge(risk_label: str):
 def render_page_header(title: str, subtitle: str = None):
     """Renders a clean page header."""
     subtitle_html = (
-        f'<p style="color: #94a3b8; font-size: 1rem; margin-top: 4px; margin-bottom: 0;">{subtitle}</p>'
+        f'<p style="color: var(--text-secondary); font-size: 1rem; margin-top: 4px; margin-bottom: 0;">{subtitle}</p>'
         if subtitle
         else ""
     )
     st.markdown(
         f"""
         <div style="margin-bottom: 25px;">
-            <h2 style="color: #f8fafc; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.8rem; margin: 0; letter-spacing: -0.5px;">{title}</h2>
+            <h2 style="color: var(--text-primary); font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.8rem; margin: 0; letter-spacing: -0.5px;">{title}</h2>
             {subtitle_html}
         </div>
         """,
@@ -465,9 +465,9 @@ def render_empty_state(message: str = "No data loaded yet."):
     """Renders a clean glassmorphic empty state."""
     st.markdown(
         f"""
-        <div class="glass-card" style="padding: 40px 20px; text-align: center; border-style: dashed; border-color: rgba(255,255,255,0.15);">
+        <div class="glass-card" style="padding: 40px 20px; text-align: center; border-style: dashed; border-color: var(--border-color);">
             <div style="font-size: 2.2rem; margin-bottom: 12px;">📊</div>
-            <div style="color: #94a3b8; font-size: 0.95rem; font-family: 'Inter', sans-serif;">{message}</div>
+            <div style="color: var(--text-secondary); font-size: 0.95rem; font-family: 'Inter', sans-serif;">{message}</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -510,8 +510,8 @@ def render_demo_mode_banner():
             box-shadow: 0 4px 15px rgba(99, 102, 241, 0.05);
         ">
             <span style="font-size: 1.2rem; margin-right: 12px;">💡</span>
-            <div style="color: #e2e8f0; font-size: 0.88rem; font-family: 'Inter', sans-serif; line-height: 1.4;">
-                <strong style="color: #818cf8;">Recruiter Demo Mode Active:</strong> Ingestion and fitting tasks are skipped. The dashboard is populated with cached walk-forward backtest results and historical data curves for immediate exploration.
+            <div style="color: var(--text-primary); font-size: 0.88rem; font-family: 'Inter', sans-serif; line-height: 1.4;">
+                <strong style="color: var(--accent-color);">Recruiter Demo Mode Active:</strong> Ingestion and fitting tasks are skipped. The dashboard is populated with cached walk-forward backtest results and historical data curves for immediate exploration.
             </div>
         </div>
         """,

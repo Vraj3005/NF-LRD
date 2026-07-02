@@ -172,11 +172,10 @@ def analyze_regimes(
     df_regime = df.copy()
     df_regime["regime_state"] = states
 
-    # Calculate daily simple return if not present
-    if "ret_simple" not in df_regime.columns and "raw_close" in df_regime.columns:
+    # Always calculate daily simple return directly from raw close or close to ensure decimal format
+    if "raw_close" in df_regime.columns:
         df_regime["ret_simple"] = df_regime["raw_close"].pct_change(fill_method=None)
-    elif "ret_simple" not in df_regime.columns:
-        # Fallback to reconstructing return from scaled feature or close
+    else:
         df_regime["ret_simple"] = df_regime["close"].pct_change(fill_method=None)
 
     df_regime["ret_simple"] = df_regime["ret_simple"].fillna(0.0)

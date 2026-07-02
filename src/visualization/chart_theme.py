@@ -31,6 +31,15 @@ REGIME_COLORS = {
     "Bearish High Volatility": "#f43f5e",  # Red/Rose
 }
 
+# Strategy-specific stable color mapping (premium, high-contrast in both themes)
+STRATEGY_COLORS = {
+    "Buy And Hold": "#94a3b8",        # Slate Gray (Benchmark)
+    "Ema Crossover": "#3b82f6",       # Vibrant Blue
+    "Vol Targeting": "#a855f7",       # Vibrant Purple
+    "Regime Aware": "#f59e0b",        # Vibrant Amber/Orange
+    "Hybrid": "#10b981",              # Vibrant Emerald Green
+}
+
 
 def apply_chart_theme(fig: go.Figure) -> go.Figure:
     """
